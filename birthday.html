@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>生日快樂</title>
+
+    <style>
+        /* 整體頁面背景、字體、置中 */
+        body {
+            background: #f7f7ff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 80px;
+            overflow-x: hidden; /* 防止動畫超出頁面時出現捲軸 */
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .yes { background: #a9d8ff; }
+        .no { background: #ffd3d3; }
+
+        #result {
+            margin-top: 40px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        /* 氣球動畫 */
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 60px;
+            height: 80px;
+            background-color: #ffb6c1;
+            border-radius: 50%;
+            animation: floatUp 6s linear infinite;
+            box-shadow: inset -5px -10px 0 rgba(0,0,0,0.1);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-900px) rotate(20deg); }
+        }
+
+        /* 彩帶噴射 */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: red;
+            animation: confettiFall 1.5s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translate(0,0) rotate(0); opacity: 1; }
+            100% { transform: translate(200px,600px) rotate(360deg); opacity: 0; }
+        }
+
+        /* 左邊噴出 */
+        .confetti.left { left: 0; }
+
+        /* 右邊噴出 */
+        .confetti.right {
+            right: 0;
+            animation: confettiFallRight 1.5s linear forwards;
+        }
+
+        @keyframes confettiFallRight {
+            0% { transform: translate(0,0) rotate(0); opacity: 1; }
+            100% { transform: translate(-200px,600px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+  <style>
+    /* 彩帶容器 */
+    #confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    
+    /* 初始不顯示 */
+    #confetti-container:not(.active) {
+      display: none;
+    }
+
+    /* 彩帶小條 */
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 20px;
+      background-color: hsl(var(--hue), 80%, 60%);
+      opacity: 0;
+      transform: translateY(-100px) rotate(0deg);
+      animation: explode 1s ease-out forwards;
+    }
+
+    @keyframes explode {
+      0% {
+        opacity: 1;
+        transform: translateY(0) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--x), var(--y)) rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body onload="generateConfetti()">
+
+    <h1>你是陳紹綸嗎？</h1>
+
+    <button class="yes" onclick="sayYes()">是</button>
+    <button class="no" onclick="sayNo()">否</button>
+
+    <div id="result"></div>
+
+    <script>
+        /* 隨機產生氣球 */
+        function createBalloon() {
+            const balloon = document.createElement("div");
+            balloon.classList.add("balloon");
+            balloon.style.left = Math.random() * window.innerWidth + "px";
+            balloon.style.backgroundColor = randomColor();
+            balloon.style.animationDuration = (5 + Math.random() * 4) + "s";
+            document.body.appendChild(balloon);
+
+            setTimeout(() => balloon.remove(), 7000);
+        }
+
+        /* 產生彩帶 */
+        function shootConfetti(side) {
+            for (let i = 0; i < 15; i++) {
+                const confetti = document.createElement("div");
+                confetti.classList.add("confetti", side);
+                confetti.style.backgroundColor = randomColor();
+                confetti.style.top = "80px";
+                confetti.style.left = side === "left" ? "0" : "auto";
+                confetti.style.right = side === "right" ? "0" : "auto";
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 1600);
+            }
+        }
+
+        /* 顏色隨機產生器 */
+        function randomColor() {
+            const colors = ["#ff7675", "#74b9ff", "#55efc4", "#ffeaa7", "#a29bfe", "#fab1a0"];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        /* 點按鈕事件 */
+        function sayYes() {
+            document.getElementById("result").innerHTML = "陳紹綸 祝你生日快樂🎂";
+            startCelebration();
+        }
+
+        function sayNo() {
+            document.getElementById("result").innerHTML = "我們一起祝陳紹綸生日快樂🎊";
+            startCelebration();
+        }
+
+        /* 氣球 & 彩帶一起啟動 */
+        function startCelebration() {
+            // 連續產生氣球
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createBalloon, i * 300);
+            }
+
+            // 左右兩邊噴彩帶
+            shootConfetti("left");
+            shootConfetti("right");
+        }
+    </script>
+
+<script>
+  // 預先建立彩帶
+  function generateConfetti() {
+    const container = document.getElementById('confetti-container');
+    for (let i = 0; i < 80; i++) {
+      const piece = document.createElement('div');
+      piece.classList.add('confetti-piece');
+
+      // 隨機顏色
+      piece.style.setProperty('--hue', Math.floor(Math.random() * 360));
+
+      // 隨機爆開方向
+      const x = (Math.random() - 0.5) * 600 + 'px';
+      const y = (Math.random() - 0.5) * 600 + 'px';
+      piece.style.setProperty('--x', x);
+      piece.style.setProperty('--y', y);
+
+      container.appendChild(piece);
+    }
+  }
+</script>
+
+  <!-- 彩帶與氣球動畫 -->
+  <div id="confetti-container" class="confetti"></div>
+
+  <script>
+    function showMessage(isYes) {
+      const yesMessage = document.getElementById('yesMessage');
+      const noMessage = document.getElementById('noMessage');
+      const question = document.getElementById('question');
+      const buttons = document.querySelector('.buttons');
+
+      // 隱藏按鈕與問題文字
+      question.style.display = 'none';
+      buttons.style.display = 'none';
+
+      // 顯示訊息
+      if (isYes) {
+        yesMessage.style.display = 'block';
+      } else {
+        noMessage.style.display = 'block';
+      }
+
+      // 播放彩帶爆開動畫
+      launchConfetti();
+    }
+
+    function launchConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.classList.add('active');
+
+      // 2 秒後自動消失
+      setTimeout(() => {
+        container.classList.remove('active');
+        container.innerHTML = ''; // 清空彩帶
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
